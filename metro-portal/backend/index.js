@@ -1,19 +1,23 @@
-const express = require('express');
-const cors = require('cors');
-const bodyParser = require('body-parser');
+const express = require("express");
+const cors = require("cors");
+const bodyParser = require("body-parser");
 
-const authRoutes = require('./routes/auth');
-const articlesRoutes = require('./routes/articles');
-const categoriesRoutes = require('./routes/categories');
+const authRoutes = require("./routes/auth");
+const articlesRoutes = require("./routes/articles");
+const categoriesRoutes = require("./routes/categories");
+
+const authMiddleware = require("./middleware/auth");
 
 const app = express();
+
 app.use(cors());
 app.use(bodyParser.json());
 
-// Роуты
-app.use('/api/auth', authRoutes);
-app.use('/api/articles', articlesRoutes);
-app.use('/api/categories', categoriesRoutes);
+// Авторизация
+app.use("/auth", authRoutes);
 
-const PORT = 5000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+// Защищённые маршруты
+app.use("/articles", authMiddleware, articlesRoutes);
+app.use("/categories", authMiddleware, categoriesRoutes);
+
+app.listen(5000, () => console.log("Backend running on http://localhost:5000"));
