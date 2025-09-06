@@ -1,46 +1,98 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from "react-router-dom";
+import { AppBar, Toolbar, Typography, Button } from "@mui/material";
+
 import LoginForm from "./components/LoginForm";
-import ArticleList from "./components/ArticleList";
-import CategoryList from "./components/CategoryList";
+import Home from "./pages/Home";
+import Categories from "./pages/Categories";
+import ArticlePage from "./pages/ArticlePage";
+import Admin from "./pages/Admin";
+import NotFound from "./pages/NotFound";
+
+// Компонент AppBar с условным отображением кнопки выхода
+const Header = ({ token, handleLogout }) => {
+  const location = useLocation();
+
+  // Не показываем кнопку на странице логина
+  const showLogout = token && location.pathname !== "/login";
+
+  return (
+    <AppBar
+      position="static"
+      sx={{
+        background: "linear-gradient(135deg, #6a11cb 0%, #2575fc 100%)",
+        boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.25)",
+      }}
+    >
+      <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
+        <Typography
+          variant="h6"
+          sx={{
+            flexGrow: 1,
+            fontFamily: "'Roboto', sans-serif",
+            fontWeight: 700,
+            fontSize: { xs: "18px", sm: "24px" },
+            color: "#fff",
+          }}
+        >
+          Dəstək Portalı
+        </Typography>
+
+        {showLogout && (
+          <Button
+            onClick={handleLogout}
+            sx={{
+              fontFamily: "'Roboto', sans-serif",
+              fontWeight: 600,
+              background: "#fff",
+              color: "#2575fc",
+              textTransform: "none",
+              borderRadius: 2,
+              px: 2,
+              py: 0.7,
+              "&:hover": {
+                background: "#f0f0f0",
+              },
+            }}
+          >
+            Çıxış
+          </Button>
+        )}
+      </Toolbar>
+    </AppBar>
+  );
+};
 
 function App() {
-  const [user, setUser] = useState(null);
-  const [articles, setArticles] = useState([]);
-  const [categories, setCategories] = useState([]);
-
-  const token = localStorage.getItem("token");
-  if (token) axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-
-  useEffect(() => {
-    if (user) {
-      axios.get("http://localhost:5000/categories").then((res) => setCategories(res.data));
-      axios.get("http://localhost:5000/articles").then((res) => setArticles(res.data));
-    }
-  }, [user]);
+  const [token, setToken] = useState(localStorage.getItem("token"));
 
   const handleLogout = () => {
     localStorage.removeItem("token");
-    setUser(null);
+    setToken(null);
   };
 
-  if (!user) return <LoginForm onLogin={setUser} />;
+  const PrivateRoute = ({ children }) => {
+    return token ? children : <Navigate to="/login" />;
+  };
+
+  useEffect(() => {
+    setToken(localStorage.getItem("token"));
+  }, []);
 
   return (
-    <div style={{ padding: "20px" }}>
-      <div style={{ display: "flex", justifyContent: "space-between" }}>
-        <h1>Привет, {user.name}</h1>
-        <button onClick={handleLogout}>Выйти</button>
-      </div>
-      <div style={{ display: "flex", marginTop: "20px" }}>
-        <div style={{ width: "25%", marginRight: "20px" }}>
-          <CategoryList categories={categories} />
-        </div>
-        <div style={{ width: "75%" }}>
-          <ArticleList articles={articles} />
-        </div>
-      </div>
-    </div>
+    <Router>
+      <Header token={token} handleLogout={handleLogout} />
+
+      <Routes>
+        <Route path="/login" element={<LoginForm onLogin={setToken} />} />
+        <Route path="/home" element={<PrivateRoute><Home /></PrivateRoute>} />
+        <Route path="/categories" element={<PrivateRoute><Categories /></PrivateRoute>} />
+        <Route path="/article/:id" element={<PrivateRoute><ArticlePage /></PrivateRoute>} />
+        <Route path="/admin" element={<PrivateRoute><Admin /></PrivateRoute>} />
+        <Route path="/" element={<Navigate to="/login" />} />
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </Router>
   );
 }
 
