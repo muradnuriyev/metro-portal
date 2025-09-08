@@ -26,7 +26,7 @@ const LoginForm = ({ onLogin }) => {
       navigate("/home");
     } catch (err) {
       console.error(err);
-      setError(err.response?.data?.message || "Ошибка входа");
+      setError(err.response?.data?.message || "Giriş xətası");
     }
   };
 
@@ -66,7 +66,7 @@ const LoginForm = ({ onLogin }) => {
 
         <form onSubmit={handleSubmit}>
           <TextField
-            label="Vəsiqə nömrəniz"
+            label="Vəsiqə nömrəsi"
             value={personalNumber}
             onChange={(e) => setPersonalNumber(e.target.value)}
             required
@@ -122,6 +122,14 @@ const LoginForm = ({ onLogin }) => {
             Giriş
           </Button>
         </form>
+        <Button
+          variant="outlined"
+          color="secondary"
+          onClick={() => (window.location.href = "/admin/login")}
+          style={{ marginTop: "10px" }}
+        >
+          Вход для админа
+        </Button>
 
         {error && (
           <Typography color="error" sx={{ mt: 2, fontSize: { xs: "12px", sm: "14px" } }}>

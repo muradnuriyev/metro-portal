@@ -1,4 +1,5 @@
 // backend/index.js
+require('dotenv').config();
 const express = require("express");
 const cors = require("cors");
 const bodyParser = require("body-parser");
@@ -6,7 +7,7 @@ const bodyParser = require("body-parser");
 const authRoutes = require("./routes/auth");
 const articlesRoutes = require("./routes/articles");
 const categoriesRoutes = require("./routes/categories");
-
+const adminAuthRoutes = require("./admin/adminAuth");
 const authMiddleware = require("./middleware/auth");
 
 const app = express();
@@ -14,7 +15,7 @@ app.use(cors());
 
 app.use(cors());
 app.use(bodyParser.json());
-
+app.use("/api/admin/auth", adminAuthRoutes);
 // Авторизация
 app.use("/auth", authRoutes);
 

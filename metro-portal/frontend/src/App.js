@@ -8,6 +8,8 @@ import Categories from "./pages/Categories";
 import ArticlePage from "./pages/ArticlePage";
 import Admin from "./pages/Admin";
 import NotFound from "./pages/NotFound";
+import AdminLogin from "./admin/AdminLogin";
+import AdminPanel from "./admin/AdminPanel";
 
 // Компонент AppBar с условным отображением кнопки выхода
 const Header = ({ token, handleLogout }) => {
@@ -65,35 +67,52 @@ const Header = ({ token, handleLogout }) => {
 
 function App() {
   const [token, setToken] = useState(localStorage.getItem("token"));
+  const [adminToken, setAdminToken] = useState(localStorage.getItem("adminToken"));
 
   const handleLogout = () => {
     localStorage.removeItem("token");
+    localStorage.removeItem("adminToken");
     setToken(null);
+    setAdminToken(null);
   };
 
+  // приватный роут для обычных пользователей
   const PrivateRoute = ({ children }) => {
     return token ? children : <Navigate to="/login" />;
   };
 
+  // приватный роут для админки
+  const AdminPrivateRoute = ({ children }) => {
+    return adminToken ? children : <Navigate to="/admin/login" />;
+  };
+
   useEffect(() => {
     setToken(localStorage.getItem("token"));
+    setAdminToken(localStorage.getItem("adminToken"));
   }, []);
 
   return (
     <Router>
-      <Header token={token} handleLogout={handleLogout} />
+      <Header token={token || adminToken} handleLogout={handleLogout} />
 
       <Routes>
+        {/* обычные пользователи */}
         <Route path="/login" element={<LoginForm onLogin={setToken} />} />
         <Route path="/home" element={<PrivateRoute><Home /></PrivateRoute>} />
         <Route path="/categories" element={<PrivateRoute><Categories /></PrivateRoute>} />
         <Route path="/article/:id" element={<PrivateRoute><ArticlePage /></PrivateRoute>} />
-        <Route path="/admin" element={<PrivateRoute><Admin /></PrivateRoute>} />
+
+        {/* админка */}
+        <Route path="/admin/login" element={<AdminLogin />} />
+        <Route path="/admin" element={<AdminPrivateRoute><AdminPanel /></AdminPrivateRoute>} />
+
+        {/* редиректы */}
         <Route path="/" element={<Navigate to="/login" />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </Router>
   );
 }
+
 
 export default App;

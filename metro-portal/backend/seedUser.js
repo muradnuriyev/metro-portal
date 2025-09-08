@@ -7,7 +7,7 @@ async function addUser(personal_number, password, name) {
 
         // используем pool.query
         await pool.query(
-            "INSERT INTO users (personal_number, password, name) VALUES (?, ?, ?)",
+            "INSERT INTO admins (username, password, role) VALUES (?, ?, ?)",
             [personal_number, hashedPassword, name]
         );
 
@@ -20,4 +20,4 @@ async function addUser(personal_number, password, name) {
 }
 
 // Пример
-addUser("1234", "27-08-2001", "Иван Иванов");
+addUser("1234", "27-08-2001", "Murad Nuriyev");
