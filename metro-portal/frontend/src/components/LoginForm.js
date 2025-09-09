@@ -85,7 +85,7 @@ const LoginForm = ({ onLogin }) => {
           />
 
           <TextField
-            label="Şifrəniz"
+            label="Şifrə"
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
@@ -128,7 +128,7 @@ const LoginForm = ({ onLogin }) => {
           onClick={() => (window.location.href = "/admin/login")}
           style={{ marginTop: "10px" }}
         >
-          Вход для админа
+          Admin Panelinə Giriş
         </Button>
 
         {error && (
