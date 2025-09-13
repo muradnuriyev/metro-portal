@@ -1,7 +1,7 @@
 const express = require("express");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs"); // для шифрования паролей
-const pool = require("../db"); // подключение к PostgreSQL
+const pool = require("../db"); // подключение к MySQL
 const router = express.Router();
 
 // POST /api/admin/auth/login
@@ -24,7 +24,7 @@ router.post("/login", async (req, res) => {
     console.log("PASSWORD MATCH:", isMatch);
 
     if (!isMatch) {
-      return res.status(400).json({ msg: "Неверный пароль" });
+      return res.status(400).json({ msg: "Incorrect password" });
     }
 
     const token = jwt.sign(
@@ -38,10 +38,7 @@ router.post("/login", async (req, res) => {
     res.json({ adminToken: token, fullName: admin.fullname });
   } catch (err) {
     console.error("LOGIN ERROR:", err);
-    res.status(500).json({ msg: "Ошибка сервера" });
+    res.status(500).json({ msg: "Server error" });
   }
 });
 module.exports = router;
-
-// Пример использования
-// app.use("/api/admin/auth", require("./admin/adminAuth"));

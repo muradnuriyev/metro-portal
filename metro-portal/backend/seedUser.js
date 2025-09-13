@@ -7,7 +7,7 @@ async function addUser(personal_number, password, name) {
 
         // используем pool.query
         await pool.query(
-            "INSERT INTO admins (username, password, role) VALUES (?, ?, ?)",
+            "INSERT INTO admins (username, password) VALUES (?, ?)",
             [personal_number, hashedPassword, name]
         );
 
